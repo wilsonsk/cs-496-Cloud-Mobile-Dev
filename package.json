@@ -1,0 +1,23 @@
+{
+  "name": "cs496",
+  "version": "1.0.0",
+  "description": "REST API Implementation of Assignment 3",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wilsonsk/cs-496-Cloud-Mobile-Dev.git"
+  },
+  "keywords": [
+    "REST",
+    "API"
+  ],
+  "author": "Sky Wilson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wilsonsk/cs-496-Cloud-Mobile-Dev/issues"
+  },
+  "homepage": "https://github.com/wilsonsk/cs-496-Cloud-Mobile-Dev#readme"
+}
