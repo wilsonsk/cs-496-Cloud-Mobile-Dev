@@ -16,7 +16,7 @@ server.get('/', (res, req) => {
 });
 */
 
-server.get('/', (res, req) => {
+server.get('/', (req, res) => {
 	res.render('pages/test');
 });
 server.use(express.static('public'));
