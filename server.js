@@ -8,15 +8,10 @@ var socketServer = server.listen(3000, () => {
   console.log('Express is listening on port ' + config.port);
 });
 
-/*
-server.get('/', (res, req) => {
+server.get('/', (req, res) => {
 	res.render('pages/index', {
 		serverVar: "Variable from Server"
 	});
 });
-*/
 
-server.get('/', (req, res) => {
-	res.render('pages/test');
-});
 server.use(express.static('public'));
