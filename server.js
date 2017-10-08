@@ -1,10 +1,10 @@
-var express = require('express');
+const express = require('express');
 const server = express();
-var config = require('./config.js');
+const config = require('./config.js');
 
 server.set('view engine', 'ejs');
 
-var socketServer = server.listen(3000, () => {
+var socketServer = server.listen(config.port, () => {
   console.log('Express is listening on port ' + config.port);
 });
 
