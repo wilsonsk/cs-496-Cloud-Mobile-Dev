@@ -53,17 +53,9 @@ function getBoats(){
 		});
 }
 
-// REST API - Insert Record Route
+// REST API - Get Record Route
 server.get('/', (req, res, next) => {
-	// Create a boat record to be stored in the database
-	const boat = {
-		timestamp: new Date(),
-		// Store a hash of the IP address of the user doing the insertion
-		userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
-	};
-
-	insertRec(boat)
-		.then(() => getBoats())
+	getBoats()
 		.then((boats) => {
 			res
 				.status(200)
@@ -73,6 +65,21 @@ server.get('/', (req, res, next) => {
 		})
 		.catch(next);
 });
+
+// REST API - Insert Record Route
+server.get('/newBoat', (req, res, next) => {
+	// Create a boat record to be stored in the database
+	const boat = {
+		timestamp: new Date(),
+		// Store a hash of the IP address of the user doing the insertion
+		userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
+	};
+
+	insertRec(boat)
+		.then(res.redirect('/'));
+});
+
+
 
 // 404 Error Handler
 server.use((req, res) => {
