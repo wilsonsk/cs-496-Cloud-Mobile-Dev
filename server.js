@@ -49,7 +49,7 @@ function getBoats(){
 	return datastore.runQuery(query) 
 		.then((results) => {
 			const entities = results[0];
-			return entities.map((entity) => 'Time: ${entity.timestamp}, AddrHash: ${entity.userIp}');
+			return entities.map((entity) => `Time: ${entity.timestamp}, AddrHash: ${entity.userIp}`);
 		});
 }
 
