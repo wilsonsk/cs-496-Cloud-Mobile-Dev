@@ -66,9 +66,13 @@ function retrieveBoat(boatId){
 			});
 	}else{
 		const query = datastore.createQuery('boat')
-			.filter('__key__','=', boatId);
+			.filter('__key__', '=', datastore.key([
+				'boat',
+				boatId
+			]));
 
 		return datastore.runQuery(query);
+		console.log("boatId: " + boatId);
 	}
 }
 
@@ -93,13 +97,14 @@ server.get('/', (req, res, next) => {
   * Get Record Route
   */
 server.get('/:boatId', (req, res, next) => {
+	//res.send(`boatId = ${req.params.boatId}`);
 	retrieveBoat(req.params.boatId)
 		.then((boat) => {
 			res
 				.status(200)
 				.set('Content-Type', 'text/plain')
-				.send(`Boat ${boat[datastore.KEY].id}:\n${boat.timstamp}`)
-				.end();
+				//.send(`Boat ${boat[datastore.KEY].id}:\n${boat.timestamp}`)
+				.send(`boatId = ${req.params.boatId}`);
 		})
 		.catch(next);
 });
