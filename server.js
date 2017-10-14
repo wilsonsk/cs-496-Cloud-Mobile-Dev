@@ -62,16 +62,27 @@ function retrieveBoat(boatId){
 		return datastore.runQuery(query) 
 			.then((results) => {
 				const entities = results[0];
+				console.log(`TEST!: ${entities}`);
 				return entities.map((entity) => `Entity.timestamp: ${entity.timestamp}, Entity key: ${entity[datastore.KEY].id}`);
+				//return entities.map((entity) => `Entity.timestamp: ${entity.timestamp}, Entity key: ${Key('boat', entity[datastore.KEY].id})`);
+				//return entities.map((entity) => `Entity.timestamp: ${entity.timestamp}, Entity key: ${datastore.key('boat', entity[datastore.KEY].id})`);
 			});
 	}else{
 		const query = datastore.createQuery('boat')
-			.filter('__key__', '=', datastore.key([
+			.filter('__key__', '=', boatId);
+			/*.filter('__key__', '=', datastore.key([
 				'boat',
 				boatId
-			]));
+			]));*/
 
-		return datastore.runQuery(query);
+		return datastore.runQuery(query)
+			.then((result) => {
+				const entity = result[0];
+				//return entity.map((e) => `Entity.timestamp: ${e.timestamp}, Entity key: ${e[datastore.KEY].id}`);
+				//return `Entity.timestamp: ${entity.timestamp}, Entity key: ${entity[datastore.KEY].id}`;
+				console.log(`TEST!: ${entity}`);
+				return entity;
+			});
 	}
 }
 
@@ -98,13 +109,17 @@ server.get('/', (req, res, next) => {
   */
 server.get('/:boatId', (req, res, next) => {
 	//res.send(`boatId = ${req.params.boatId}`);
-	retrieveBoat(req.params.boatId)
+	var key = datastore.key(['boat', parseInt(req.params.boatId)]);
+	console.log(key);
+	retrieveBoat(key)
 		.then((boat) => {
 			res
 				.status(200)
 				.set('Content-Type', 'text/plain')
-				.send(`Boat ${boat[datastore.KEY]}:\n${boat.timestamp}`)
+				//.send(`Boat ${req.params.boatId}: \n${boat}`)
+				//.send(`Boat ${boat[datastore.KEY]}:\n${boat.timestamp}`)
 				//.send(`boatId = ${req.params.boatId}`);
+				.send(`Boat: ${key}`);
 		})
 		.catch(next);
 });
