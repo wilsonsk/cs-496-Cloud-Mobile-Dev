@@ -72,7 +72,6 @@ function retrieveBoat(boatId){
 			]));
 
 		return datastore.runQuery(query);
-		console.log("boatId: " + boatId);
 	}
 }
 
@@ -94,7 +93,8 @@ server.get('/', (req, res, next) => {
 
 // REST API - Route Handlers
 /**
-  * Get Record Route
+  * Get Record Route - Calls retrieveBoat() which queries for the boat entity with the user's defined boat ID.
+  * 			- responds with a string containing the boat id returned from the datastore entity
   */
 server.get('/:boatId', (req, res, next) => {
 	//res.send(`boatId = ${req.params.boatId}`);
@@ -103,15 +103,16 @@ server.get('/:boatId', (req, res, next) => {
 			res
 				.status(200)
 				.set('Content-Type', 'text/plain')
-				//.send(`Boat ${boat[datastore.KEY].id}:\n${boat.timestamp}`)
-				.send(`boatId = ${req.params.boatId}`);
+				.send(`Boat ${boat[datastore.KEY]}:\n${boat.timestamp}`)
+				//.send(`boatId = ${req.params.boatId}`);
 		})
 		.catch(next);
 });
 
 // REST API - Insert Record Route
 /**
-  * POST Record Route
+  * POST Record Route - Calls createBoat() which initializes a new boat entity with appropriate auto and user defined properties.
+  * 			- response redirects to '/'
   */
 server.post('/newBoat', (req, res, next) => {
 	// Create a boat record to be stored in the database
