@@ -83,6 +83,48 @@ function retrieveBoat(boatId){
 	}
 }
 
+/** 
+  * DELETE boat records from the database
+  */
+function deleteBoat(boatId){
+        if(typeof boatId === 'undefined'){
+                const query = datastore.createQuery('boat')
+
+                return datastore.runQuery(query)
+                        .then((results) => {
+                                const entities = results[0];
+				var allBoatKeys = [];
+				/*for(var i = 0; i < entities.length; i++){
+					allBoatKeys.push(entities[i][datastore.KEY])
+				}*/
+				entities.map((entity) => {
+					allBoatKeys.push(entity[datastore.KEY]);
+				});
+
+				datastore.delete(allBoatKeys)
+					.then(() => {
+						console.log('deleteBoat (All boats) complete');
+					});
+                        });
+        }else{
+                const query = datastore.createQuery('boat')
+                        .filter('__key__', '=', boatId);
+
+                return datastore.runQuery(query)
+                        .then((result) => {
+                                const entities = result[0];
+                                const entity = entities[0];
+                                var key = entity[datastore.KEY];
+				
+				datastore.delete(key)
+					.then(() => {
+						console.log('deleteBoat (one boat) complete');
+					});
+                        });
+        }
+}
+
+
 // REST API - Route Handlers
 /**
   * Get Record Route
@@ -101,7 +143,7 @@ server.get('/', (req, res, next) => {
 
 // REST API - Route Handlers
 /**
-  * Get Record Route - Calls retrieveBoat() which queries for the boat entity with the user's defined boat ID.
+  * Get Record Route - Calls retrieveBoats() which queries for the boat entity with the user's defined boat ID.
   * 			- responds with a string containing the boat id returned from the datastore entity
   */
 server.get('/:boatId', (req, res, next) => {
@@ -135,6 +177,26 @@ server.post('/boats', (req, res, next) => {
 	createBoat(boat)
 		.then(res.redirect('/'));
 });
+
+// REST API - Insert Record Route
+/**
+  * DELETE Record Route - Calls deleteBoat() which retrieves boat entity keys or a single boat key based on user input, then deletes those keys
+  * 			- response redirects to '/'
+  */
+server.delete('/boats', (req, res, next) => {
+	deleteBoat()
+		.then(() => {
+			retriveBoat()
+				.then((boats) => {
+					res
+						.status(200)
+						.set('Content-Type', 'text/plain')
+						.send(`Last 10 boats:\n${boats.join('\n')}`)
+						.end();
+				})
+		.catch(next);
+});
+
 
 
 
