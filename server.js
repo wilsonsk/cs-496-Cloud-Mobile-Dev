@@ -178,24 +178,41 @@ server.post('/boats', (req, res, next) => {
 		.then(res.redirect('/'));
 });
 
-// REST API - Insert Record Route
+// REST API 
 /**
-  * DELETE Record Route - Calls deleteBoat() which retrieves boat entity keys or a single boat key based on user input, then deletes those keys
+  * DELETE Record Route - Calls deleteBoat() which retrieves all boat entity keys, then deletes those keys
   * 			- response redirects to '/'
   */
 server.delete('/boats', (req, res, next) => {
 	deleteBoat()
 		.then(() => {
-			retriveBoat()
-				.then((boats) => {
-					res
-						.status(200)
-						.set('Content-Type', 'text/plain')
-						.send(`Last 10 boats:\n${boats.join('\n')}`)
-						.end();
-				})
+			res
+				.status(200)
+				.set('Content-Type', 'text/plain')
+				.send(`DELETED ALL BOATS`)
+				.end();
+		})
 		.catch(next);
 });
+
+// REST API 
+/**
+  * DELETE Record Route - Calls deleteBoat() which retrieves a single boat key based on user input, then deletes those keys
+  * 			- response redirects to '/'
+  */
+server.delete('/boats/:boatId', (req, res, next) => {
+	var key = datastore.key(['boat', parseInt(req.params.boatId)]); // req.params.<> gets parameters from URL
+	deleteBoat(key)
+		.then(() => {
+			res
+				.status(200)
+				.set('Content-Type', 'text/plain')
+				.send(`DELETED BOAT: ${req.params.boatId}`)
+				.end();
+		})
+		.catch(next);
+});
+
 
 
 
