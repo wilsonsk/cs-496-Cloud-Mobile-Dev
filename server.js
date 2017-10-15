@@ -137,6 +137,19 @@ function replaceBoat(boat_key, boat){
 	});
 }
 
+/** 
+  * MODIFY a 'boat' record in the database
+  * 
+  * @param {boat} boat - The boat record to modify
+  */
+function modifyBoat(boat_key, boat){
+	return datastore.update({
+		key: boat_key,
+		data: boat
+	});
+}
+
+
 
 
 // REST API - Route Handlers
@@ -276,6 +289,64 @@ server.put('/boats/:boatId', (req, res, next) => {
 	console.log("PUT TEST: " + req.body.name);
 	console.log("PUT TEST: " + replacementBoat.name);
 });
+
+// REST API - MODIFY Record Route
+/**
+  * PATCH Record Route - Calls replaceBoat() which modifies an existing boat entity with appropriate auto and user defined properties.
+  * 			- response redirects to '/'
+  */
+server.patch('/boats/:boatId', (req, res, next) => {
+	var key = datastore.key(['boat', parseInt(req.params.boatId)]); // req.params.<> gets parameters from URL
+	// Create a boat record to be stored in the database
+	const replacementBoat = {
+		//name: req.body.name, //req.body.<> gets parameters from body of request
+		//type: req.body.boatType,
+		//length: req.body.boatLength,
+		//at_sea: true,
+		//timestamp: new Date()
+		// Store a hash of the IP address of the user doing the insertion
+		//userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
+	};
+	
+	//RUN A QUERY HERE INSTEAD OF get()	
+
+	var temp = datastore.get(key, function(err, entity){
+		return entity;
+	});
+//	var boatToModify = temp[0];
+/*
+	replacementBoat.timestamp = new Date();
+	if(typeof req.body.name === 'undefined'){
+		replacementBoat.name = boatToModify.name;
+	}else{
+		replacementBoat.name = req.body.name;
+	}
+	if(typeof req.body.type === 'undefined'){
+		replacementBoat.type = boatToModify.type;
+	}else{
+		replacementBoat.type = req.body.type;
+	}
+	if(typeof req.body.length === 'undefined'){
+		replacementBoat.length = boatToModify.length;
+	}else{
+		replacementBoat.length = req.body.length;
+	}
+	if(typeof req.body.at_sea === 'undefined'){
+		replacementBoat.at_sea = true;
+	}else{
+		replacementBoat.at_sea = boatToModify.at_sea;
+	}
+	replaceBoat(key, replacementBoat)
+		.then(res.redirect(303, '/'));
+*/
+	console.log("req.params.boatId: " + req.params.boatId);
+	console.log("key from boatId: " + key);
+	console.log("boatToModify: " + JSON.stringify(temp));
+	console.log("PATCH TUEST: " + JSON.stringify(replacementBoat));
+	console.log("PATCH TEST: " + req.body.name);
+	console.log("PATCH TEST: " + replacementBoat.name);
+});
+
 
 
 
