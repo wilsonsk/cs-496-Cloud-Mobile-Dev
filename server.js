@@ -77,11 +77,14 @@ function retrieveBoat(boatId){
 
 		return datastore.runQuery(query)
 			.then((result) => {
-				const entity = result[0];
+				const entities = result[0];
 				//return entity.map((e) => `Entity.timestamp: ${e.timestamp}, Entity key: ${e[datastore.KEY].id}`);
 				//return `Entity.timestamp: ${entity.timestamp}, Entity key: ${entity[datastore.KEY].id}`;
-				console.log(`TEST!: ${entity}`);
-				return entity;
+				const entity = entities[0];
+				var key = entity[datastore.KEY];
+				console.log(`NEwTEST: ${JSON.stringify(key)}`);
+				//return entity;
+				return key;
 			});
 	}
 }
