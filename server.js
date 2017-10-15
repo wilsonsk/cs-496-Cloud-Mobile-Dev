@@ -77,8 +77,9 @@ function retrieveBoat(boatId){
 			.then((result) => {
 				const entities = result[0];
 				const entity = entities[0];
-				var key = entity[datastore.KEY];
-				return key;
+				//var key = entity[datastore.KEY];
+				//return key;
+				return entity;
 			});
 	}
 }
@@ -123,6 +124,19 @@ function deleteBoat(boatId){
                         });
         }
 }
+
+/** 
+  * REPLACE a 'boat' record in the database
+  * 
+  * @param {boat} boat - The boat record to replace
+  */
+function replaceBoat(boat_key, boat){
+	return datastore.update({
+		key: boat_key,
+		data: boat
+	});
+}
+
 
 
 // REST API - Route Handlers
@@ -211,6 +225,56 @@ server.delete('/boats/:boatId', (req, res, next) => {
 				.end();
 		})
 		.catch(next);
+});
+
+// REST API - REPLACE Record Route
+/**
+  * PUT Record Route - Calls replaceBoat() which replaces a new boat entity with appropriate auto and user defined properties.
+  * 			- response redirects to '/'
+  */
+server.put('/boats/:boatId', (req, res, next) => {
+	var key = datastore.key(['boat', parseInt(req.params.boatId)]); // req.params.<> gets parameters from URL
+	// Create a boat record to be stored in the database
+	const replacementBoat = {
+		//name: req.body.name, //req.body.<> gets parameters from body of request
+		//type: req.body.boatType,
+		//length: req.body.boatLength,
+		//at_sea: true,
+		//timestamp: new Date()
+		// Store a hash of the IP address of the user doing the insertion
+		//userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
+	};
+	replacementBoat.timestamp = new Date();
+	if(typeof req.body.name === 'undefined'){
+		replacementBoat.name = 'Default Boat Name';
+	}else{
+		replacementBoat.name = req.body.name;
+	}
+	if(typeof req.body.type === 'undefined'){
+		replacementBoat.type = 'Default Boat Type';
+	}else{
+		replacementBoat.type = req.body.type;
+	}
+	if(typeof req.body.length === 'undefined'){
+		replacementBoat.length = 'Default Boat Length';
+	}else{
+		replacementBoat.length = req.body.length;
+	}
+	if(typeof req.body.at_sea === 'undefined'){
+		replacementBoat.at_sea = true;
+	}else{
+		if(req.body.at_sea === true){
+			replacementBoat.at_sea = true;
+		}else{
+			replacementBoat.at_sea = false;
+		}
+	}
+	replaceBoat(key, replacementBoat)
+		.then(res.redirect(303, '/'));
+
+	console.log("PUT TUEST: " + JSON.stringify(replacementBoat));
+	console.log("PUT TEST: " + req.body.name);
+	console.log("PUT TEST: " + replacementBoat.name);
 });
 
 
