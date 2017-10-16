@@ -567,6 +567,9 @@ server.put('/slips/:slipId', (req, res, next) => {
 	}else{
 		replacementSlip.number = req.body.number;
 	}
+	if(typeof req.body.arrival_date === 'undefined'){
+		replacementSlip.arrival_date = null;
+	}
 	if(typeof req.body.current_boat === 'undefined'){
 		replacementSlip.current_boat = null;
 	}else{
@@ -592,14 +595,12 @@ server.put('/slips/:slipId', (req, res, next) => {
 
 		datastore.runQuery(query2)
 			.then((result) => {
-				result.at_sea = false;
+                                const entities = result[0];
+				const entity = entities[0];
+				entity.at_sea = false;
+				console.log(`entity.at_sea = ${entity.at_sea}`);
 			});
 		
-	}
-	if(typeof req.body.arrival_date === 'undefined'){
-		replacementSlip.arrival_date = null;
-	}else{
-		replacementSlip.arrival_date = req.body.arrival_date;
 	}
 
 	replaceSlip(key, replacementSlip)
@@ -607,6 +608,7 @@ server.put('/slips/:slipId', (req, res, next) => {
 
 	console.log("PUT TEST req.body.number: " + req.body.number);
 	console.log("PUT replacementSlip: " + replacementSlip.number);
+	console.log("PUT replacementSlip.current_boat: " + replacementSlip.current_boat);
 });
 
 // REST API - MODIFY Record Route
