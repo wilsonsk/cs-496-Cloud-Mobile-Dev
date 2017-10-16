@@ -51,7 +51,6 @@ function retrieveBoat(boatId){
 	if(typeof boatId === 'undefined'){
 		const query = datastore.createQuery('boat')
 			.order('timestamp', {descending: true })
-			.limit(10);
 
 		return datastore.runQuery(query) 
 			.then((results) => {
@@ -179,6 +178,43 @@ function createSlip(slip){
         });
 }
 
+/** 
+  * DELETE slip records from the database
+  */
+function deleteSlip(slipId){
+        if(typeof slipId === 'undefined'){
+                const query = datastore.createQuery('slip')
+
+                return datastore.runQuery(query)
+                        .then((results) => {
+                                const entities = results[0];
+                                var allSlipKeys = [];
+                                entities.map((entity) => {
+                                        allSlipKeys.push(entity[datastore.KEY]);
+                                });
+
+                                datastore.delete(allSlipKeys)
+                                        .then(() => {
+                                                console.log('deleteSlip (All slips) complete');
+                                        });
+                        });
+        }else{
+                const query = datastore.createQuery('slip')
+                        .filter('__key__', '=', slipId);
+
+                return datastore.runQuery(query)
+                        .then((result) => {
+                                const entities = result[0];
+                                const entity = entities[0];
+                                var key = entity[datastore.KEY];
+
+                                datastore.delete(key)
+                                        .then(() => {
+                                                console.log('deleteSlip (one slip) complete');
+                                        });
+                        });
+        }
+}
 
 
 // REST API - Route Handlers
@@ -191,7 +227,7 @@ server.get('/boats', (req, res, next) => {
 			res
 				.status(200)
 				.set('Content-Type', 'text/plain')
-				.send(`Last 10 boats:\n${boats.join('\n')}`)
+				.send(`All boats:\n${boats.join('\n')}`)
 				.end();
 		})
 		.catch(next);
@@ -390,7 +426,7 @@ server.get('/slips', (req, res, next) => {
                         res
                                 .status(200)
                                 .set('Content-Type', 'text/plain')
-                                .send(`Last 10 slips:\n${slips.join('\n')}`)
+                                .send(`All slips:\n${slips.join('\n')}`)
                                 .end();
                 })
                 .catch(next);
@@ -430,6 +466,40 @@ server.post('/slips', (req, res, next) => {
 		.then(res.redirect('/slips'));
 });
 
+// REST API 
+/**
+  * DELETE Record Route - Calls deleteSlip() which retrieves all slip entity keys, then deletes those keys
+  *                     - response redirects to '/'
+  */
+server.delete('/slips', (req, res, next) => {
+        deleteSlip()
+                .then(() => {
+                        res
+                                .status(200)
+                                .set('Content-Type', 'text/plain')
+                                .send(`DELETED ALL SLIPS`)
+                                .end();
+                })
+                .catch(next);
+});
+
+// REST API 
+/**
+  * DELETE Record Route - Calls deleteSlip() which retrieves a single slip key based on user input, then deletes those keys
+  *                     - response redirects to '/'
+  */
+server.delete('/slips/:slipId', (req, res, next) => {
+        var key = datastore.key(['slip', parseInt(req.params.slipId)]); // req.params.<> gets parameters from URL
+        deleteSlip(key)
+                .then(() => {
+                        res
+                                .status(200)
+                                .set('Content-Type', 'text/plain')
+                                .send(`DELETED SLIP: ${req.params.slipId}`)
+                                .end();
+                })
+                .catch(next);
+});
 
 
 
