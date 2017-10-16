@@ -568,12 +568,36 @@ server.put('/slips/:slipId', (req, res, next) => {
 		replacementSlip.number = req.body.number;
 	}
 	if(typeof req.body.current_boat === 'undefined'){
-		replacementSlip.current_boat = 'Default Current Boat';
+		replacementSlip.current_boat = null;
 	}else{
+		const query1 = datastore.createQuery('slip');
+
+		datastore.runQuery(query1)
+			.then((results) => {
+				const entities = results[0];	
+				entities.map((entity) => {
+					if(entity.current_boat == req.body.current_boat){
+						entity.current_boat = null;
+						entity.arrival_date = null;
+					}
+				});
+			});
+	
 		replacementSlip.current_boat = req.body.current_boat;
+		replacementSlip.arrival_date = new Date();
+
+		var boatKey = datastore.key(['boat', parseInt(req.params.current_boat)]); // req.params.<> gets parameters from URL
+		const query2 = datastore.createQuery('boat')
+			.filter('__key__', '=', boatKey);
+
+		datastore.runQuery(query2)
+			.then((result) => {
+				result.at_sea = false;
+			});
+		
 	}
 	if(typeof req.body.arrival_date === 'undefined'){
-		replacementSlip.arrival_date = 'Default Arrival Date';
+		replacementSlip.arrival_date = null;
 	}else{
 		replacementSlip.arrival_date = req.body.arrival_date;
 	}
@@ -581,7 +605,6 @@ server.put('/slips/:slipId', (req, res, next) => {
 	replaceSlip(key, replacementSlip)
 		.then(res.redirect(303, '/slips'));
 
-	console.log("PUT replacementSlip: " + JSON.stringify(replacementSlip));
 	console.log("PUT TEST req.body.number: " + req.body.number);
 	console.log("PUT replacementSlip: " + replacementSlip.number);
 });
