@@ -216,6 +216,31 @@ function deleteSlip(slipId){
         }
 }
 
+/** 
+  * REPLACE a 'slip' record in the database
+  * 
+  * @param {slip} slip - The slip record to replace
+  */
+function replaceSlip(slip_key, slip){
+	return datastore.update({
+		key: slip_key,
+		data: slip
+	});
+}
+
+/** 
+  * MODIFY a 'slip' record in the database
+  * 
+  * @param {slip} slip - The slip record to modify
+  */
+function modifySlip(slip_key, slip){
+	return datastore.update({
+		key: slip_key,
+		data: slip
+	});
+}
+
+
 
 // REST API - Route Handlers
 /**
@@ -357,7 +382,7 @@ server.put('/boats/:boatId', (req, res, next) => {
 
 // REST API - MODIFY Record Route
 /**
-  * PATCH Record Route - Calls replaceBoat() which modifies an existing boat entity with appropriate auto and user defined properties.
+  * PATCH Record Route - Calls modifyBoat() which modifies an existing boat entity with appropriate auto and user defined properties.
   * 			- response redirects to '/'
   */
 server.patch('/boats/:boatId', (req, res, next) => {
@@ -449,6 +474,24 @@ server.get('/slips/:slipId', (req, res, next) => {
                 .catch(next);
 });
 
+// REST API - Route Handlers
+/**
+  * Get Record Route - Calls retrieveSlipss() which queries for the slip entity with the user's defined slip ID.
+  *                     - responds with a string containing the slip id returned from the datastore entity
+  */
+server.get('/slips/:slipId/boat', (req, res, next) => {
+        var key = datastore.key(['slip', parseInt(req.params.slipId)]); // req.params.<> gets parameters from URL
+        retrieveSlip(key)
+                .then((slip) => {
+                        res
+                                .status(200)
+                                .set('Content-Type', 'text/plain')
+                                .send(`Slip ${JSON.stringify(slip)}: current_boat: ${JSON.stringify(slip.current_boat)}`);
+                })
+                .catch(next);
+});
+
+
 // REST API - Insert Record Route
 /**
   * POST Record Route - Calls createSlip() which initializes a new slip entity with appropriate auto and user defined properties.
@@ -500,6 +543,102 @@ server.delete('/slips/:slipId', (req, res, next) => {
                 })
                 .catch(next);
 });
+
+// REST API - REPLACE Record Route
+/**
+  * PUT Record Route - Calls replaceSlip() which replaces a new slip entity with appropriate auto and user defined properties.
+  * 			- response redirects to '/'
+  */
+server.put('/slips/:slipId', (req, res, next) => {
+	var key = datastore.key(['slip', parseInt(req.params.slipId)]); // req.params.<> gets parameters from URL
+	// Create a boat record to be stored in the database
+	const replacementSlip = {
+		//name: req.body.name, //req.body.<> gets parameters from body of request
+		//type: req.body.boatType,
+		//length: req.body.boatLength,
+		//at_sea: true,
+		//timestamp: new Date()
+		// Store a hash of the IP address of the user doing the insertion
+		//userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
+	};
+	replacementSlip.timestamp = new Date();
+	if(typeof req.body.number === 'undefined'){
+		replacementSlip.number = 'Default Slip Number';
+	}else{
+		replacementSlip.number = req.body.number;
+	}
+	if(typeof req.body.current_boat === 'undefined'){
+		replacementSlip.current_boat = 'Default Current Boat';
+	}else{
+		replacementSlip.current_boat = req.body.current_boat;
+	}
+	if(typeof req.body.arrival_date === 'undefined'){
+		replacementSlip.arrival_date = 'Default Arrival Date';
+	}else{
+		replacementSlip.arrival_date = req.body.arrival_date;
+	}
+
+	replaceSlip(key, replacementSlip)
+		.then(res.redirect(303, '/slips'));
+
+	console.log("PUT replacementSlip: " + JSON.stringify(replacementSlip));
+	console.log("PUT TEST req.body.number: " + req.body.number);
+	console.log("PUT replacementSlip: " + replacementSlip.number);
+});
+
+// REST API - MODIFY Record Route
+/**
+  * PATCH Record Route - Calls modifySlip() which modifies an existing slip entity with appropriate auto and user defined properties.
+  * 			- response redirects to '/'
+  */
+server.patch('/slips/:slipId', (req, res, next) => {
+	var key = datastore.key(['slip', parseInt(req.params.slipId)]); // req.params.<> gets parameters from URL
+	// Create a boat record to be stored in the database
+	const replacementSlip = {
+		//name: req.body.name, //req.body.<> gets parameters from body of request
+		//type: req.body.boatType,
+		//length: req.body.boatLength,
+		//at_sea: true,
+		//timestamp: new Date()
+		// Store a hash of the IP address of the user doing the insertion
+		//userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
+	};
+	
+	//RUN A QUERY HERE INSTEAD OF get()	
+	retrieveSlip(key)
+                .then((slipToModify) => {
+                        res
+			        replacementSlip.timestamp = new Date();
+        			if(typeof req.body.number === 'undefined'){
+                			replacementSlip.number = slipToModify.number;
+        			}else{
+        			        replacementSlip.number = req.body.number;
+        			}
+        			if(typeof req.body.current_boat === 'undefined'){
+        			        replacementSlip.current_boat = slipToModify.current_boat;
+        			}else{
+        			        replacementSlip.current_boat = req.body.current_boat;
+        			}
+        			if(typeof req.body.arrival_date === 'undefined'){
+        			        replacementSlip.arrival_date = slipToModify.arrival_date;
+        			}else{
+        			        replacementSlip.arrival_date = req.body.arrival_date;
+        			}
+
+		        	replaceSlip(key, replacementSlip);
+
+		        	console.log("req.params.slipId: " + req.params.slipId);
+		        	console.log("key from slipId: " + key);
+		        	console.log("slipToModify: " + JSON.stringify(slipToModify));
+		        	console.log("PATCH TUEST: " + JSON.stringify(slipToModify.name));
+		        	console.log("PATCH TEST: " + req.body.name);
+		        	console.log("PATCH TEST: " + replacementSlip.name);
+
+		                res.redirect(303, '/slips');
+                })
+});
+
+
 
 
 
