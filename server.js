@@ -19,17 +19,7 @@ var socketServer = server.listen(config.port, () => {
   console.log('Express is listening on port ' + config.port);
 });
 
-//REST API - Boats
-
-/*
-// Temporary Landing Page
-server.get('/', (req, res) => {
-	res.render('pages/index', {
-		serverVar: "Variable from Server"
-	});
-});
-*/
-
+//REST API - Boats - helper functions
 /** 
   * Save a 'boat' record into the database
   * 
@@ -149,6 +139,45 @@ function modifyBoat(boat_key, boat){
 	});
 }
 
+/** 
+  * Retrieve all slip records from the database
+  */
+function retrieveSlip(slipId){
+        if(typeof slipId === 'undefined'){
+                const query = datastore.createQuery('slip')
+                        .order('timestamp', {descending: true })
+
+                return datastore.runQuery(query)
+                        .then((results) => {
+                                const entities = results[0];
+                                return entities.map((entity) => `Entity id: ${entity[datastore.KEY].id}, Entity.number: ${entity.number}, Entity.current_boat: ${entity.current_boat}, Entity.arrival_date: ${entity.arrival_date}`);
+                        });
+        }else{
+                const query = datastore.createQuery('slip')
+                        .filter('__key__', '=', slipId);
+
+                return datastore.runQuery(query)
+                        .then((result) => {
+                                const entities = result[0];
+                                const entity = entities[0];
+                                //var key = entity[datastore.KEY];
+                                //return key;
+                                return entity;
+                        });
+        }
+}
+
+/** 
+  * Insert a 'boat' record into the database
+  * 
+  * @param {boat} boat - The boat record to insert
+  */
+function createSlip(slip){
+        return datastore.insert({
+                key: datastore.key('slip'),
+                data: slip
+        });
+}
 
 
 
@@ -156,7 +185,7 @@ function modifyBoat(boat_key, boat){
 /**
   * Get Record Route
   */
-server.get('/', (req, res, next) => {
+server.get('/boats', (req, res, next) => {
 	retrieveBoat()
 		.then((boats) => {
 			res
@@ -173,7 +202,7 @@ server.get('/', (req, res, next) => {
   * Get Record Route - Calls retrieveBoats() which queries for the boat entity with the user's defined boat ID.
   * 			- responds with a string containing the boat id returned from the datastore entity
   */
-server.get('/:boatId', (req, res, next) => {
+server.get('/boats/:boatId', (req, res, next) => {
 	var key = datastore.key(['boat', parseInt(req.params.boatId)]); // req.params.<> gets parameters from URL
 	retrieveBoat(key)
 		.then((boat) => {
@@ -202,7 +231,7 @@ server.post('/boats', (req, res, next) => {
 		//userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
 	};
 	createBoat(boat)
-		.then(res.redirect('/'));
+		.then(res.redirect('/boats'));
 });
 
 // REST API 
@@ -283,7 +312,7 @@ server.put('/boats/:boatId', (req, res, next) => {
 		}
 	}
 	replaceBoat(key, replacementBoat)
-		.then(res.redirect(303, '/'));
+		.then(res.redirect(303, '/boats'));
 
 	console.log("PUT TUEST: " + JSON.stringify(replacementBoat));
 	console.log("PUT TEST: " + req.body.name);
@@ -342,10 +371,64 @@ server.patch('/boats/:boatId', (req, res, next) => {
 		        	console.log("PATCH TEST: " + req.body.name);
 		        	console.log("PATCH TEST: " + replacementBoat.name);
 
-		                res.redirect(303, '/');
+		                res.redirect(303, '/boats');
                 })
 });
 
+
+/**
+  * Slip routes
+  */
+
+// REST API - Route Handlers
+/**
+  * Get Record Route
+  */
+server.get('/slips', (req, res, next) => {
+        retrieveSlip()
+                .then((slips) => {
+                        res
+                                .status(200)
+                                .set('Content-Type', 'text/plain')
+                                .send(`Last 10 slips:\n${slips.join('\n')}`)
+                                .end();
+                })
+                .catch(next);
+});
+
+// REST API - Route Handlers
+/**
+  * Get Record Route - Calls retrieveSlipss() which queries for the slip entity with the user's defined slip ID.
+  *                     - responds with a string containing the slip id returned from the datastore entity
+  */
+server.get('/slips/:slipId', (req, res, next) => {
+        var key = datastore.key(['slip', parseInt(req.params.slipId)]); // req.params.<> gets parameters from URL
+        retrieveSlip(key)
+                .then((slip) => {
+                        res
+                                .status(200)
+                                .set('Content-Type', 'text/plain')
+                                .send(`Slip: ${JSON.stringify(slip)}`);
+                })
+                .catch(next);
+});
+
+// REST API - Insert Record Route
+/**
+  * POST Record Route - Calls createSlip() which initializes a new slip entity with appropriate auto and user defined properties.
+  * 			- response redirects to '/'
+  */
+server.post('/slips', (req, res, next) => {
+	// Create a slip record to be stored in the database
+	const slip = {
+		number: req.body.number, //req.body.<> gets parameters from body of request
+		current_boat: null,
+		arrival_date: null,
+		timestamp: new Date()
+	};
+	createSlip(slip)
+		.then(res.redirect('/slips'));
+});
 
 
 
