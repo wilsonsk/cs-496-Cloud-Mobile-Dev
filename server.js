@@ -546,6 +546,7 @@ server.delete('/slips/:slipId', (req, res, next) => {
   * PUT Record Route - Calls replaceSlip() which replaces a new slip entity with appropriate auto and user defined properties.
   * 			- response redirects to '/'
   */
+/*
 server.put('/slips/:slipId', (req, res, next) => {
 	var key = datastore.key(['slip', parseInt(req.params.slipId)]); // req.params.<> gets parameters from URL
 	// Create a boat record to be stored in the database
@@ -570,8 +571,7 @@ server.put('/slips/:slipId', (req, res, next) => {
 					data: entity
 				});
 			});
-		)};
-	/*
+		});
 		console.log(`key = ${JSON.stringify(key)}`);
 		retrieveSlip(key)
 			.then((entity) => {
@@ -599,7 +599,6 @@ server.put('/slips/:slipId', (req, res, next) => {
 					        });
 					});			
 			});
-	*/
 		
 
 		const query1 = datastore.createQuery('slip');
@@ -645,9 +644,9 @@ server.put('/slips/:slipId', (req, res, next) => {
 				key: boatKey,
 				data: entity
 			});
-		)};
+		});
 
-		/*const query2 = datastore.createQuery('boat')
+		const query2 = datastore.createQuery('boat')
 			.filter('__key__', '=', boatKey);
 
 		datastore.runQuery(query2)
@@ -674,14 +673,13 @@ server.put('/slips/:slipId', (req, res, next) => {
 					}
 				});
 			});
-		*/
 		
 	}
 
 	replaceSlip(key, replacementSlip)
 		.then(res.redirect(303, '/slips'));
 });
-
+*/
 // REST API - MODIFY Record Route
 /**
   * PATCH Record Route - Calls modifySlip() which modifies an existing slip entity with appropriate auto and user defined properties.

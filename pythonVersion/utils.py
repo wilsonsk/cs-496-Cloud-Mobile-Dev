@@ -1,7 +1,4 @@
 # utils.py
-#
-# Description: Utility functions 
-
 
 from google.appengine.ext import ndb
 import webapp2

@@ -44,96 +44,98 @@ class SlipHandler(webapp2.RequestHandler):
         self.response.write(message)
         self.err=True
 
-
+#
+# POST
+# CREATE a new Slip
+#
     def post(self, id=None):
-        """Create a slip."""
-
-        # Get the body of the post.
+# Attempt to get request body
         try: body = json.loads(self.request.body)
-        except: self._writeErr(405, "Error: Couldn't get body data")
+        except: self._writeErr(405, "Error: Body invalud JSON")
 
-        # Prevent posting with an id.
+# Error check for prohibited ID
         if id:
-            self._sendErr(403, "Error: A slip cannot be posted with an id.")
+            self._writeErr(403, "Error: ID's are prohibited with POST.")
 
-        # Prevent duplicate numbered slips...
+# Error check against duplicate slip numbers
         if Slip.query(Slip.number == body['number']).get(): 
-            self._sendErr(403, "Error: A slip of that numer already exists.")
+            self._writeErr(403, "Error: Slip number already exists.")
 
-        # If no errors, create the slip...
+# If no errors, create a new slip entity
         if not self.err:
             body['arrival_date'] = "null";
             body['current_boat'] = "null";
-            print("hello")
+# Instantiate
+            slip_entity = Slip(**body)
+            slip_entity.put()
+            print("DEBUG: Created new slip entity")
             print(body)
-            new_slip = Slip(**body)
-            new_slip.put()
-            self.response.write(new_slip.toJsonStr())
-
-
+            self.response.write(slip_entity.formatSlip())
+# 
+# GET
+# Retrieve a specific slip entity or all slips
+#
     def get(self, id=None):
-        """Get either a specific slip, or a list of all slips."""
+# If an id passed, attempt to return specific slips's data
+# Use utils.getObj for entity retrieval via ID number
         if id:
-
-            # Attempt to get slip with given id.
             slip = getObj(id)
 
-            # Send an error if no slip found with said id.
+# If no slip entity returned from ID, write an error 
             if not slip: 
-                self.sendErr(405, "Error: Bad slip id.")
+                self.writeErr(405, "Error: Invalid slip ID.")
 
-            # If no error set, respond with slip info.
+# If no error, send response specific slip data
             if not self.err:
-                self.response.write(slip.toJsonStr())
+                self.response.write(slip.formatSlip())
+
+# Else return the data for all boats
         else:
-            # Get all slips.
+# Retrieve all boats
             slips = Slip.query().fetch()
 
-            # Populate the list of slips.
+# Create an empty list to populate with slips
             slip_dicts = {'Slips':[]}
-            for slip in slips: # Convert slips to a dictionary.
-                slip_dicts['Slips'].append(json.loads(slip.toJsonStr()))
+# Format each slip and append it to the slips list
+            for slip in slips: 
+                slip_dicts['Slips'].append(json.loads(slip.formatSlip()))
 
-            # Send all slips.
+# Send response slips data
             self.response.write(jsonDumps(slip_dicts))
 
+# 
+# PATCH
+# MODIFY a slip - Maintain any previous values of properties not updated
+#
     def patch(self, id=None):
-        """Edit a slip."""
-        # Enforce id requriement.
-        if not id:
-            self._sendErr(403, 'Error: Id Required for Patch')
-        
-        # If no error, attempt to get slip with given id, send error if not.
-        if not self.err:
+# Enforce id requriement.
+        if id:
             slip = getObj(id)
-            if not slip: 
-                self.sendErr(405, "Error: Bad slip id.")
-
-        # If no errors, get the body of the post.
-        if not self.err:
-            try: body = json.loads(self.request.body)
-            except: self._sendErr(405, "Error: Couldn't get body data")
-
-        # If no errors, then patch using body data.
-        if not self.err:
-            if 'number' in body:
-                slip.number = body['number']
-            slip.put()
-            self.response.write(slip.toJsonStr())
-
+	    if slip: 
+            	try: body = json.loads(self.request.body)
+            	except: self._writeErr(405, "Error: Body invalid JSON")
+            	if 'number' in body:
+            	    slip.number = body['number']
+            	    slip.put()
+           	    self.response.write(slip.formatSlip())
+	    else:
+                self.writeErr(405, "Error: Invalid slip ID.")
+	else:
+            self.response.status = "403 Missing ID";
+            self._writeErr(403, 'Error: Id Required for Patch')
+# 
+# DELETE
+# REMOVE a specific slip entity or all slip entities
+# 
     def delete(self, id=None):
-        """Delete a slip."""
-        # Enforce id requriement.
         if not id:
-            self._sendErr(403, 'Error: Id Required for Delete.')
+            self._writeErr(403, 'Error: Id Required for Delete Request.')
 
-        # If no error, attempt to get slip with given id, send error if not.
         if not self.err:
             slip = getObj(id)
             if not slip: 
-                self.sendErr(405, "Error: Bad slip id.")
+                self.writeErr(405, "Error: Invalid slip ID.")
 
-        # If no errors, delete the slip.
         if not self.err:
             slip.key.delete()
             self.response.write('Slip Deleted')

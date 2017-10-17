@@ -120,8 +120,8 @@ class BoatHandler(webapp2.RequestHandler):
                 boat_dict = boat.to_dict()
                 self.response.write(jsonDumps(boat_dict))
             else:
-                self.response.status = "405 Bad Id";
-                self.response.write('Error: Bad Id Provided')
+                self.response.status = "405 Invalid Id";
+                self.response.write('Error: Invalid Id Provided')
         else:
             self.response.status = "403 No ID";
             self.response.write('Error: Id Required for Patch')
@@ -133,6 +133,7 @@ class BoatHandler(webapp2.RequestHandler):
     def put(self, id=None):
         if id:
 # Get entity of boat ID
+	    #boat = getObj(id)
             boat = ndb.Key(urlsafe=id).get()
 # If a boat entity is returned:
             if boat:
@@ -149,7 +150,7 @@ class BoatHandler(webapp2.RequestHandler):
                 self.response.write(jsonDumps(boat_dict))
             else:
                 self.response.status = "405 Invalid ID";
-                self.response.write('Error: Invalid Boat ID')
+                self.response.write('Error: Invalid ID Provided')
         else:
             self.response.status = "403 Missing ID";
             self.response.write('Error: Id Required for Patch Request')
@@ -161,6 +162,7 @@ class BoatHandler(webapp2.RequestHandler):
 # 
     def delete(self, id=None):
         if id:
+	    #boat = getObj(id)
             boat = ndb.Key(urlsafe=id).get()
             if boat:
                 boat.key.delete()
