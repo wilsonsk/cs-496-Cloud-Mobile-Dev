@@ -25,10 +25,10 @@ var socketServer = server.listen(config.port, () => {
   * 
   * @param {boat} boat - The boat record to save
   */
-function saveBoat(boat){
+function saveEntity(ent, key, kind){
 	return datastore.save({
-		key: datastore.key('boat'),
-		data: boat
+		key: datastore.key(String(kind)),
+		data: ent
 	});
 }
 
@@ -172,6 +172,7 @@ function retrieveSlip(slipId){
   * @param {boat} boat - The boat record to insert
   */
 function createSlip(slip){
+	console.log(`Creating slip...${JSON.stringify(slip)}`);
         return datastore.insert({
                 key: datastore.key('slip'),
                 data: slip
@@ -374,10 +375,6 @@ server.put('/boats/:boatId', (req, res, next) => {
 	}
 	replaceBoat(key, replacementBoat)
 		.then(res.redirect(303, '/boats'));
-
-	console.log("PUT TUEST: " + JSON.stringify(replacementBoat));
-	console.log("PUT TEST: " + req.body.name);
-	console.log("PUT TEST: " + replacementBoat.name);
 });
 
 // REST API - MODIFY Record Route
@@ -552,63 +549,120 @@ server.delete('/slips/:slipId', (req, res, next) => {
 server.put('/slips/:slipId', (req, res, next) => {
 	var key = datastore.key(['slip', parseInt(req.params.slipId)]); // req.params.<> gets parameters from URL
 	// Create a boat record to be stored in the database
-	const replacementSlip = {
-		//name: req.body.name, //req.body.<> gets parameters from body of request
-		//type: req.body.boatType,
-		//length: req.body.boatLength,
-		//at_sea: true,
-		//timestamp: new Date()
-		// Store a hash of the IP address of the user doing the insertion
-		//userIp: crypto.createHash('sha256').update(req.ip).digest('hex').substr(0, 7)
-	};
+	const replacementSlip = {};
 	replacementSlip.timestamp = new Date();
 	if(typeof req.body.number === 'undefined'){
 		replacementSlip.number = 'Default Slip Number';
 	}else{
 		replacementSlip.number = req.body.number;
 	}
-	if(typeof req.body.arrival_date === 'undefined'){
-		replacementSlip.arrival_date = null;
-	}
+	replacementSlip.arrival_date = null;
 	if(typeof req.body.current_boat === 'undefined'){
 		replacementSlip.current_boat = null;
 	}else{
+		console.log(`key = ${JSON.stringify(key)}`);
+		retrieveSlip(key)
+			.then((entity) => {
+				var temp = entity.current_boat;
+				console.log(`temp: current boat = ${entity.current_boat}`);
+				var tempKey = datastore.key(['boat', parseInt(temp)]); 
+				console.log(`tempKey = ${JSON.stringify(tempKey)}`);
+				retrieveBoat(tempKey)
+					.then((entity) => {
+						var ent = {};
+						entity.at_sea = true;
+						console.log(`entity from tempKey = ${JSON.stringify(entity)}`);
+						console.log(`tempKey = ${JSON.stringify(tempKey)}`);
+						var t_k1 = entity[datastore.KEY];
+						var t_k2 = datastore.key(['boat', parseInt(temp)]); 
+
+						console.log(`entity[datastore.KEY] = ${JSON.stringify(t_k1)}`);
+						console.log(`datastore.key(['boat', id]) = ${JSON.stringify(t_k2)}`);
+						//replaceBoat(t_k, entity);
+					        datastore.save({
+                					key: tempKey,
+                					data: {
+								at_sea: true
+							}
+					        });
+					});			
+			});
+		
+
 		const query1 = datastore.createQuery('slip');
 
+		// Check for any slips that currently have this boat and remove it from their properties as well as the arrival date
 		datastore.runQuery(query1)
 			.then((results) => {
 				const entities = results[0];	
 				entities.map((entity) => {
-					if(entity.current_boat == req.body.current_boat){
-						entity.current_boat = null;
-						entity.arrival_date = null;
+					console.log(`entity.current_boat = ${entity.current_boat}`);
+					if(entity.current_boat !== null && entity.current_boat == req.body.current_boat){
+						var changedSlip = {};
+
+						console.log(`Q1 results = ${JSON.stringify(results)}`);
+						console.log(`Q1 entities = ${JSON.stringify(entities)}`);
+						console.log(`Q1 entity = ${JSON.stringify(entity)}`);
+						console.log(`Q1 entity.current_boat = ${entity.current_boat}`);
+	
+						changedSlip.number = entity.number;
+						changedSlip.current_boat = null;
+						changedSlip.arrival_date = null;
+						entity[datastore.KEY].id = parseInt(entity[datastore.KEY].id);
+						var k = entity[datastore.KEY];
+						console.log(`k =  ${JSON.stringify(k)}`);
+						//saveEntity(changedSlip, k, 'slip');
+					        datastore.save({
+                					key: k,
+                					data: {
+								number: entity.number,
+								current_boat: null,
+								arrival_date: null
+							}
+					        });
 					}
 				});
 			});
 	
+
+		// Put this new boat and arrival time into the replacement slip
 		replacementSlip.current_boat = req.body.current_boat;
 		replacementSlip.arrival_date = new Date();
 
-		var boatKey = datastore.key(['boat', parseInt(req.params.current_boat)]); // req.params.<> gets parameters from URL
+		// Find that boat entity and set it's at_sea property to false
+		var boatKey = datastore.key(['boat', parseInt(req.body.current_boat)]); // req.body.<> gets parameters from urlencoded body
 		const query2 = datastore.createQuery('boat')
 			.filter('__key__', '=', boatKey);
 
 		datastore.runQuery(query2)
 			.then((result) => {
+				var changedBoat = {};
                                 const entities = result[0];
 				const entity = entities[0];
-				entity.at_sea = false;
-				console.log(`entity.at_sea = ${entity.at_sea}`);
+				console.log(`Q2 entity.at_sea = ${entity.at_sea}`);
+				console.log(`Q2 boatKey = ${boatKey}`);
+				
+				changedBoat.name = entity.name;
+				changedBoat.type = entity.type;
+				changedBoat.length = entity.length;		
+				changedBoat.at_sea = false;
+
+				//replace(boatKey, changedBoat);
+				datastore.save({
+					key: boatKey,
+					data: {
+						name = entity.name,
+						type = entity.type,
+						length = entity.length,		
+						at_sea = false
+					}
+				});
 			});
 		
 	}
 
 	replaceSlip(key, replacementSlip)
 		.then(res.redirect(303, '/slips'));
-
-	console.log("PUT TEST req.body.number: " + req.body.number);
-	console.log("PUT replacementSlip: " + replacementSlip.number);
-	console.log("PUT replacementSlip.current_boat: " + replacementSlip.current_boat);
 });
 
 // REST API - MODIFY Record Route
