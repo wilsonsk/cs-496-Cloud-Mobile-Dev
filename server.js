@@ -560,6 +560,18 @@ server.put('/slips/:slipId', (req, res, next) => {
 	if(typeof req.body.current_boat === 'undefined'){
 		replacementSlip.current_boat = null;
 	}else{
+		datastore.get(key, function(err, entity) {
+			var curBoat = entity.current_boat;
+			var boat_key = datastore.key(['boat', parseInt(curBoat)]);
+			datastore.get(boat_key, function (err, entity) {
+				entity.at_sea = true;
+				datastore.update({
+					key: boat_key,
+					data: entity
+				});
+			});
+		)};
+	/*
 		console.log(`key = ${JSON.stringify(key)}`);
 		retrieveSlip(key)
 			.then((entity) => {
@@ -579,7 +591,7 @@ server.put('/slips/:slipId', (req, res, next) => {
 						console.log(`entity[datastore.KEY] = ${JSON.stringify(t_k1)}`);
 						console.log(`datastore.key(['boat', id]) = ${JSON.stringify(t_k2)}`);
 						//replaceBoat(t_k, entity);
-					        datastore.save({
+					        datastore.update({
                 					key: tempKey,
                 					data: {
 								at_sea: true
@@ -587,6 +599,7 @@ server.put('/slips/:slipId', (req, res, next) => {
 					        });
 					});			
 			});
+	*/
 		
 
 		const query1 = datastore.createQuery('slip');
@@ -598,27 +611,22 @@ server.put('/slips/:slipId', (req, res, next) => {
 				entities.map((entity) => {
 					console.log(`entity.current_boat = ${entity.current_boat}`);
 					if(entity.current_boat !== null && entity.current_boat == req.body.current_boat){
-						var changedSlip = {};
+						var x = datastore.key(['slip', parseInt(entity[datastore.KEY].id)]);
 
-						console.log(`Q1 results = ${JSON.stringify(results)}`);
-						console.log(`Q1 entities = ${JSON.stringify(entities)}`);
-						console.log(`Q1 entity = ${JSON.stringify(entity)}`);
-						console.log(`Q1 entity.current_boat = ${entity.current_boat}`);
-	
+						var changedSlip = {};
 						changedSlip.number = entity.number;
 						changedSlip.current_boat = null;
 						changedSlip.arrival_date = null;
+
 						entity[datastore.KEY].id = parseInt(entity[datastore.KEY].id);
 						var k = entity[datastore.KEY];
+
 						console.log(`k =  ${JSON.stringify(k)}`);
+						console.log(`x =  ${JSON.stringify(k)}`);
 						//saveEntity(changedSlip, k, 'slip');
-					        datastore.save({
-                					key: k,
-                					data: {
-								number: entity.number,
-								current_boat: null,
-								arrival_date: null
-							}
+					        datastore.update({
+                					key: x,
+                					data: changeSlip
 					        });
 					}
 				});
@@ -631,7 +639,15 @@ server.put('/slips/:slipId', (req, res, next) => {
 
 		// Find that boat entity and set it's at_sea property to false
 		var boatKey = datastore.key(['boat', parseInt(req.body.current_boat)]); // req.body.<> gets parameters from urlencoded body
-		const query2 = datastore.createQuery('boat')
+		datastore.get(boatKey, function(err, entity) {
+			entity.at_sea = true;
+			datastore.update({
+				key: boatKey,
+				data: entity
+			});
+		)};
+
+		/*const query2 = datastore.createQuery('boat')
 			.filter('__key__', '=', boatKey);
 
 		datastore.runQuery(query2)
@@ -648,16 +664,17 @@ server.put('/slips/:slipId', (req, res, next) => {
 				changedBoat.at_sea = false;
 
 				//replace(boatKey, changedBoat);
-				datastore.save({
+				datastore.update({
 					key: boatKey,
 					data: {
-						name = entity.name,
-						type = entity.type,
-						length = entity.length,		
-						at_sea = false
+						name: entity.name,
+						type: entity.type,
+						length: entity.length,		
+						at_sea: false
 					}
 				});
 			});
+		*/
 		
 	}
 
