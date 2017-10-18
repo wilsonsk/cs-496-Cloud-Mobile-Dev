@@ -16,8 +16,8 @@ webapp2.WSGIApplication.allowed_methods = new_allowed_methods
 
 # Set http routes.
 app = webapp2.WSGIApplication([('/', Main),
-                               ('/boats', BoatHandler),
-                               ('/boats/(.*)', BoatHandler),
-                               ('/slips/?(.*)', SlipHandler)],
-                              debug=True)
+			('/boats', BoatHandler),
+			('/boats/(.*)', BoatHandler),                        
+			('/slips/?(.*)', SlipHandler)],
+			debug=True)
     

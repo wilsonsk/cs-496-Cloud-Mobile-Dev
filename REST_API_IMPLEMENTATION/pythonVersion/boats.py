@@ -32,8 +32,9 @@ class BoatHandler(webapp2.RequestHandler):
 	#
 	def post(self):
 		# Attempt to get request body
-		body = json.loads(self.request.body)
-		if not body:
+		try: 
+			body = json.loads(self.request.body.decode("utf-8"))
+		except:
 			self._sendErr(405, 'Error: Body invalid JSON.')
 
 		if not self.err:

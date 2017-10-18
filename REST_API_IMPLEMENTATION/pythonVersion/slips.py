@@ -50,8 +50,9 @@ class SlipHandler(webapp2.RequestHandler):
 	#
 	def post(self, id=None):
 		# Attempt to get request body
-			try: body = json.loads(self.request.body)
-			except: self._writeErr(405, "Error: Body invalud JSON")
+		body = json.loads(self.request.body.decode("utf-8"))
+		if not body:
+			self._writeErr(405, "Error: Body invalud JSON")
 
 		# Error check for prohibited ID
 		if id:
