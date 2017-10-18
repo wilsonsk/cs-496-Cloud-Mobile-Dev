@@ -128,7 +128,14 @@ class BoatHandler(webapp2.RequestHandler):
 	# 
 	# PUT
 	# REPLACE a boat - Change any previous values of properties not updated to default values
-	#
+	#		 - Update 'at_sea' to value of true for boat to be replaced
+	#		 - Update current slip.current_boat to replacement boat 
+	#		 - Update current slip.arrival_date to replacement value
+	#		 - Update replacement boat.at_sea to value of false
+	#		 - Update slip dict with corresponding correct format URLs
+	# def put(self, id=None):
+		
+
 
 
 	# 

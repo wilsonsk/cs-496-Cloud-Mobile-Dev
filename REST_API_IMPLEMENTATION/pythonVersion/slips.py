@@ -113,7 +113,7 @@ class SlipHandler(webapp2.RequestHandler):
 		if id:
 			slip = getObj(id)
 			if slip: 
-				body = json.loads(self.request.body)
+				body = json.loads(self.request.body.decode("utf-8"))
 				if not body:
 					self._writeErr(405, "Error: Body invalid JSON")
 				if 'number' in body:
@@ -125,7 +125,61 @@ class SlipHandler(webapp2.RequestHandler):
 		else:
 			self.response.status = "403 Missing ID";
 			self._writeErr(403, 'Error: Id Required for Patch')
-		
+        # 
+        # PUT
+        # REPLACE a slip - slip_id = URL param; boat_id (NEW current_boat) = body param
+        # 		 - Change any previous values of properties not updated to default values
+        #                - Update 'at_sea' to value of true for boat to be replaced -- EDIT: instead prohibit adding boat to preoccupied slip
+        #                - Update current slip.current_boat to replacement boat 
+        #                - Update current slip.arrival_date to replacement value
+        #                - Update replacement boat.at_sea to value of false
+        #                - Update slip dict with corresponding correct format URLs (Prepend api resource to url of current_boat and slip propery of boat) for display via response send
+        def put(self, slip_id=None):
+		if slip_id:
+			# Get request body (and decode)
+			body = json.loads(self.request.body.decode("utf-8"))
+			if not body:
+				self._writeErr(405, 'Error: Body invalid JSON.')
+	
+			# Get boat entity from current_boat body variable
+			if not self.err:
+				boat = getObj(body['current_boat'])
+				if not boat:
+					self._writeErr(405, 'Error: Body invalid curent_boat (id).')
+	
+			# Get slip entity from slip_id URL param
+			if not self.err:
+				slip = getObj(slip_id)
+				if not slip:
+					self.writeErr(405, 'Error: URL invalid slip id')
+	
+			# Prevent adding boat to preoccupied slip 
+			if not self.err:
+				if slip.current_boat != 'null':
+					self.writeErr(403, 'Error: Slip is preoccupied')
+	
+			# Manage slip transaction
+			if not self.err:
+				slip.arrival_date = body['arrival_date']
+				slip.current_boat = body['current_boat']
+				boat.at_sea = False
+				boat.slip = slip_id
+				
+				slip.put()
+				boat.put()
+
+				# format URLs for displaying
+				slip_dict = slip.to_dict()
+				boat_dict = boat.to_dict()
+				
+				slip_dict['current_boat'] = '/boats/' + body['current_boat']
+				boat_dict['slip'] = '/slips/' + slip_id
+
+				self.response.write(jsonDumps(slip_dict))
+				self.response.write(jsonDumps(boat_dict))
+		else: 
+			self.response.status = "403 Missing ID";
+			self._writeErr(403, 'Error: Id Required for Put')
 	# 
 	# DELETE
 	# REMOVE a specific slip entity or all slip entities
