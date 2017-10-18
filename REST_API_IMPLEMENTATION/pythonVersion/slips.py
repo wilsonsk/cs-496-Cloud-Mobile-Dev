@@ -194,5 +194,12 @@ class SlipHandler(webapp2.RequestHandler):
 				self.writeErr(405, "Error: Invalid slip ID.")
 
 		if not self.err:
+			b_k = slip.current_boat
+			b = getObj(b_k)
+			if b:
+				b.at_sea = True	
+				b.slip = ""
+				b.put()
+	
 			slip.key.delete()
 			self.response.write('Slip Deleted')
