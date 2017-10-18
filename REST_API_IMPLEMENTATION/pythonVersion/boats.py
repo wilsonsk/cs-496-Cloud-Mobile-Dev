@@ -133,8 +133,37 @@ class BoatHandler(webapp2.RequestHandler):
 	#		 - Update current slip.arrival_date to replacement value
 	#		 - Update replacement boat.at_sea to value of false
 	#		 - Update slip dict with corresponding correct format URLs
-	# def put(self, id=None):
-		
+	def put(self, id=None):
+		if id:
+			# Get entity of boat ID
+			boat = ndb.Key(urlsafe=id).get()
+			# If a boat entity is returned:
+			if boat:
+				# Load json request data into a boat_data object
+				boat_data = json.loads(self.request.body)
+				if 'name' in boat_data:
+					boat.name = boat_data['name']
+				else:
+					boat.name = "Value Replaced with this Default String (PUT)"
+				if 'length' in boat_data:
+					boat.length = boat_data['length']
+				else:
+					boat.length = 0
+				if 'type' in boat_data:
+					boat.type = boat_data['type']
+				else:
+					boat.type = "Value Replaced with this Default String (PUT)"
+				boat.put()
+				boat_dict = boat.to_dict()
+				self.response.write(jsonDumps(boat_dict))
+			else:
+				self.response.status = "405 Invalid Id";
+				self.response.write('Error: Invalid Id Provided')
+		else:
+			self.response.status = "403 No ID";
+			self.response.write('Error: Id Required for Put')
+
+	
 
 
 
