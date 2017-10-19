@@ -5,6 +5,7 @@ from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
 import webapp2
 import json
 from utils import jsonDumps, getObj
+import json as simplejson
 
 # Boat class model with associated properties
 class Slip(ndb.Model):
@@ -137,7 +138,7 @@ class SlipHandler(webapp2.RequestHandler):
         def put(self, slip_id=None):
 		if slip_id:
 			# Get request body (and decode)
-			body = json.loads(self.request.body.decode("utf-8"))
+			body = json.dumps(self.request.body.decode("utf-8"))
 			if not body:
 				self._writeErr(405, 'Error: Body invalid JSON.')
 	

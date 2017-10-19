@@ -109,6 +109,7 @@ class BoatHandler(webapp2.RequestHandler):
 			if boat:
 				# Load json request data into a boat_data object
 				boat_data = json.loads(self.request.body)
+				#boat.id = boat.id
 				if 'name' in boat_data:
 					boat.name = boat_data['name']
 				if 'length' in boat_data:
@@ -141,6 +142,7 @@ class BoatHandler(webapp2.RequestHandler):
 			if boat:
 				# Load json request data into a boat_data object
 				boat_data = json.loads(self.request.body)
+				boat.id = id
 				if 'name' in boat_data:
 					boat.name = boat_data['name']
 				else:
