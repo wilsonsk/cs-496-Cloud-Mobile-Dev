@@ -1,8 +1,15 @@
 {% extends "index.html"  %}
 {% block content  %}
 	<section>
-		<h1>Data from Google Plus via OAUTH2.0</h1>
-		<h3>User: {{user_name}} </h3>
-		<h3>Email: {{email}} </h3>
+		<div class="flex-container">
+			<h1 class="flex-item main-cont">Data from Google Plus via OAUTH2.0</h1>
+		</div>
+		<div class="flex-container">
+			<h3 class="flex-item main-cont">User: {{user_name}} </h3>
+		</div>
+		<div class="flex-container">
+			<h3 class="flex-item main-cont">Email: {{email}} </h3>
+		</div>
+
 	</section>
 {% endblock  %}

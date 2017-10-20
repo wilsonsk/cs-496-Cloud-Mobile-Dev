@@ -8,27 +8,31 @@
     </head>
     <body>
         <div class="container">
-	        <nav>      
+	        <nav class="flex-container">      
 	
-	        	<a href="/">Home</a>
+	        	<a class="flex-item head-text" href="/">Home</a>
 	        
 		</nav>
 	        
 		<section>
 	
 	        	{% block content %}
-	        	<p>
-				This is an OAUTH2.0 Assignment (Oregon State Univ.).<br></br>
-			</p>
-	        	<p>
-	        		<a href="{{end_user_request}}">Request that the Client Attempt to Access End User's Protectd Resources via OAUTH2.0</a>
-	        	</p>
+			<div class="flex-container" style="height: 200px;">
+				<p class="main-cont flex-item">
+					This is an Oregon State University OAUTH2.0 Assignment.
+				</p>
+			</div>
+			<div class="flex-container" style="height: 200px;">
+			        <p class="main-cont flex-item">
+			        	<a href="{{end_user_request}}">Click to Request that the Client Attempt to Access End User's Protectd Resources via OAUTH2.0</a>
+			        </p>
+			</div>
 	        	{% endblock %}
 		
 	        </section>
-	        <footer>
+	        <footer class="flex-container">
 
-	        	<a href="/">Home</a>
+	        	<a class="flex-item foot-text" href="/">Home</a>
 
        	 	</footer>
         </div>
