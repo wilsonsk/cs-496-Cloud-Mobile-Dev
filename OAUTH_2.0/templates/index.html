@@ -8,23 +8,29 @@
     </head>
     <body>
         <div class="container">
-        <nav>      
-          <a href="index.html">Home</a> | <a href="products.html">Products</a> | <a href="about.html">About</a>
-        </nav>
-        <section>
+	        <nav>      
+	
+	        	<a href="/">Home</a>
+	        
+		</nav>
+	        
+		<section>
+	
+	        	{% block content %}
+	        	<p>
+				This is an OAUTH2.0 Assignment (Oregon State Univ.).<br></br>
+			</p>
+	        	<p>
+	        		<a href="{{end_user_request}}">Request that the Client Attempt to Access End User's Protectd Resources via OAUTH2.0</a>
+	        	</p>
+	        	{% endblock %}
+		
+	        </section>
+	        <footer>
 
-        {% block content %}
+	        	<a href="/">Home</a>
 
-        <p>This is an OAUTH2.0 Assignment (Oregon State Univ.).<br></br></p>
-        <p>
-        <a href="{{login}}">Request the Client to Attempt to Access End User's Protectd Resources via OAUTH2.0</a>
-        </p>
-        {% endblock %}
-
-        </section>
-        <footer>
-          <a href="index.html">Home</a> | <a href="products.html">Products</a> | <a href="about.html">About</a>
-        </footer>
+       	 	</footer>
         </div>
     </body>
 </html>
