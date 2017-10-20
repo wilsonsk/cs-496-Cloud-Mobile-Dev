@@ -41,23 +41,18 @@ GOOGLE_PLUS_URL = "https://www.googleapis.com/plus/v1/people/me"
 #					- both provided by the "Client" 
 #				- authorization code
 
-class MainHandler():
+class MainHandler(webapp2.RequestHandler):
 	def get(self):
 		# Build OAUTH GET request URL
-		end_user_server_req = GOOGLE_OAUTH_REQ_URL + "?" + \
-			+ 'response_type=code&' + \ 
-			+ 'client_id=' + CLIENT_ID + "&" + \
-			+ 'redirect_uri=' + END_USER_REDIRECT_URL + "&" + \
-			+ 'scope=email&' + \
-			+ 'state=SuperSecret9000'
+		end_user_server_req = GOOGLE_OAUTH_REQ_URL + "?" + 'response_type=code&' + 'client_id=' + CLIENT_ID + "&" + 'redirect_uri=' + END_USER_REDIRECT_URL + "&" + 'scope=email&' + 'state=SuperSecret9000'
 		
 		# Send this URL request string to the jinja2 template and insert value into a UI button's href field
 		context = {
 			"title": "CS 496 OAUTH2.0 Assignment",
 			"end_user_request": end_user_server_req 
 		}
-		template = JINJA_ENV().get_template('index.html')
-		self.response.out.write(template(context))
+		template = JINJA_ENV.get_template('index.html')
+		self.response.out.write(template.render(context))
 
 # OAUTH Handler
 # 		- "Client" handles the redirected "End User" coming from the Google OAUTH2.0 
@@ -80,6 +75,10 @@ class MainHandler():
 #					- 'Authoriation': 'Bearer ' + token['access_token']
 #			- "Client" uses jinja2 template to display out the protected resources
 
+#
+# NotFoundHandler()
+#
+#
 
 # OPTIONAL PATCH METHOD ENABLER
 allowed_methods = webapp2.WSGIApplication.allowed_methods
@@ -87,8 +86,7 @@ new_allowed_methods = allowed_methods.union(('PATCH',))
 webapp2.WSGIApplication.allowed_methods = new_allowed_methods
 
 # Set http routes.
-app = webapp2.WSGIApplication([('/', MainHandler),
-                               ('/about-me', AboutHandler),
-                               ('/oauth', OauthHandler),
-                               ('/.*', NotFoundHandler)],
+app = webapp2.WSGIApplication([('/', MainHandler)],
+#                               ('/oauth', OauthHandler),
+#                               ('/.*', NotFoundHandler)],
                               debug=True)
