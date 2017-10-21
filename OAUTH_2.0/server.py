@@ -5,6 +5,10 @@ import webapp2
 import urllib
 import google.appengine.api.urlfetch as urlfetch
 
+# Random state generator dependencies
+import string
+from random import *
+
 # config jinja2 environment
 JINJA_ENV = jinja2.Environment(
     loader = jinja2.FileSystemLoader(os.path.dirname(__file__) + "/templates")
@@ -29,6 +33,15 @@ GOOGLE_PLUS_URL = "https://www.googleapis.com/plus/v1/people/me"
 # OAUTH2.0 initial "Client" secret
 init_secret = "SuperSecret9000"
 
+# Randomly generated state variable to display
+RAND_STATE = ""
+def genState():
+	min_char = 8
+	max_char = 12
+	allchar = string.ascii_letters + string.punctuation + string.digits
+	global RAND_STATE
+	RAND_STATE = "".join(choice(allchar) for x in range(randint(min_char, max_char)))
+
 #
 # ROUTE HANDLERS
 # 		- MainHandler()
@@ -46,13 +59,16 @@ init_secret = "SuperSecret9000"
 
 class MainHandler(webapp2.RequestHandler):
 	def get(self):
+		genState()
+		global RAND_STATE
 		# Build OAUTH GET request URL
 		end_user_server_req = GOOGLE_OAUTH_REQ_URL + "?" + 'response_type=code&' + 'client_id=' + CLIENT_ID + "&" + 'redirect_uri=' + END_USER_REDIRECT_URL + "&" + 'scope=email&state=' + init_secret
 		
 		# Send this URL request string to the jinja2 template and insert value into a UI button's href field
 		context = {
 			"title": "CS 496 OAUTH2.0 Assignment",
-			"end_user_request": end_user_server_req 
+			"end_user_request": end_user_server_req,
+			"state": RAND_STATE
 		}
 		template = JINJA_ENV.get_template('index.html')
 		self.response.write(template.render(context))
@@ -124,10 +140,15 @@ class OauthHandler(webapp2.RequestHandler):
 		url_encoded_gplus_res_data = json.loads(res.content)
 		
 		template = JINJA_ENV.get_template('gplus_results.html')
+
+		# Retrieve global randomly generated state string
+		global RAND_STATE
+
 		# Extract Google Plus Restricted Properties from url encoded response data from GPlus and add to template for display 
 		context = {
 			'user_name': url_encoded_gplus_res_data['displayName'],
-			'email': url_encoded_gplus_res_data['emails'][0]['value']
+			'email': url_encoded_gplus_res_data['emails'][0]['value'],
+			'state': RAND_STATE
 		}
 
 		# write response

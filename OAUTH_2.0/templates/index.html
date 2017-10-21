@@ -20,30 +20,30 @@
 		<section>
 	
 	        	{% block content %}
-			<div class="flex-container">
-				<p class="main-cont flex-item" id="headline-text">
-					This is an Oregon State University OAUTH 2.0 Assignment.
-				</p>
-			</div>
-			<div class="flex-container">
 				<div class="flex-col">
-					<div class="flex-container">
-					        <p class="main-cont flex-item" id="sub-head-text">
-					        	Request that the Client Attempt to Access End User's Protected Resources via OAUTH 2.0
-					        </p>
-					</div>
-					<div class="flex-container">
-					        <p class="main-cont flex-item">
-					        	Click the button below to tell this web app to use OAUTH 2.0!
-					        </p>
-					</div>
-					<div class="flex-container">
-					        <p class="main-cont flex-item">
-							<a href="{{end_user_request}}" role="button" class="btn btn-primary" id="button-text">USE OAUTH!</a>
-					        </p>
-					</div>
+					<p class="main-cont flex-item" id="headline-text">
+						This is an Oregon State University OAUTH 2.0 Assignment.
+					</p>
+				        <p class="main-cont flex-item" id="sub-head-text">
+				        	Request that the Client Attempt to Access End User's Protected Resources via OAUTH 2.0
+				        </p>
+				        <p class="main-cont flex-item" id="sub-head-text">
+				        	Click the button below to tell this web app to use OAUTH 2.0!
+				        </p>
+				        <p class="main-cont flex-item">
+						Dont forget your randomly generated state string: 
+					</p>
+				        <p class="main-cont flex-item">
+						{{state}}
+					</p>
+					</p>
+				        <p class="main-cont flex-item">
+						 Make sure it matches the state string on the next page!
+				        </p>
+				        <p class="flex-button">
+						<a href="{{end_user_request}}" role="button" class="btn btn-primary" id="button-text">USE OAUTH!</a>
+				        </p>
 				</div>
-			</div>
 	        	{% endblock %}
 		
 	        </section>

@@ -22,6 +22,10 @@
 		margin: 10px;
 		flex: 1 1 0;
 	}
+	.flex-button {
+		background-color: #FF483A;
+		flex: 1 1 0;
+	}
 	.main-cont {
 		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		font-size: 36px;
