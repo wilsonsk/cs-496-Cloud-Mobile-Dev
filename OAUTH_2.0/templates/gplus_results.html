@@ -2,22 +2,22 @@
 {% block content  %}
 	<section>
 		<div class="flex-container">
-			<div class="flex-item main-cont" id="sub-head-text">
-				<h1 class="flex-item main-cont" id="headline-text">Data from Google Plus via OAUTH2.0</h1>
+			<div class="flex-container-col">
+				<div class="flex-item main-cont" id="headline-text">
+					The "client" used the OAUTH 2.0 token obtained by presenting the authorization code (obtained by end user via intial server request)  
+				</div>
+				<div class="flex-item main-cont" id="sub-head-text">
+					Protected Resources from Google Plus via OAUTH2.0
+				</div>
+				<div class="flex-item main-cont">
+					<div id="gplus-field">User: </div>
+					<div id="sub-head-text">{{user_name}}</div>
+				</div>
+				<div class="flex-item main-cont">
+					<div id="gplus-field">Email: </div>
+					<div id="sub-head-text">{{email}}</div>
+				</div>
 			</div>
 		</div>
-		<div class="flex-container">
-			<div class="flex-item main-cont" id="sub-head-text">
-				<div id="gplus-field">User: </div>
-				<div >{{user_name}} </div>
-			</div>
-		</div>
-		<div class="flex-container">
-			<div class="flex-item main-cont" id="sub-head-text">
-				<div id="gplus-field">Email: </div>
-				<div>{{email}} </div>
-			</div>
-		</div>
-
 	</section>
 {% endblock  %}
