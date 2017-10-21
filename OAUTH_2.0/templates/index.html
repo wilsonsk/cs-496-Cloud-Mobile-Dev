@@ -11,21 +11,37 @@
 	        <nav class="flex-container">      
 	
 	        	<a class="flex-item head-text" href="/">Home</a>
+	        	<div class="flex-item head-text" href="/">Oregon State University</div>
+	        	<div class="flex-item head-text" href="/">CS 496 Mobile/Cloud</div>
 	        
 		</nav>
 	        
 		<section>
 	
 	        	{% block content %}
-			<div class="flex-container" style="height: 200px;">
-				<p class="main-cont flex-item">
+			<div class="flex-container" style="height: 300px;">
+				<p class="main-cont flex-item" id="headline-text">
 					This is an Oregon State University OAUTH2.0 Assignment.
 				</p>
 			</div>
-			<div class="flex-container" style="height: 200px;">
-			        <p class="main-cont flex-item">
-			        	<a href="{{end_user_request}}">Click to Request that the Client Attempt to Access End User's Protectd Resources via OAUTH2.0</a>
-			        </p>
+			<div class="flex-container">
+				<div class="flex-col">
+					<div class="flex-container">
+					        <p class="main-cont flex-item" id="sub-head-text">
+					        	Request that the Client Attempt to Access End User's Protected Resources via OAUTH 2.0
+					        </p>
+					</div>
+					<div class="flex-container">
+					        <p class="main-cont flex-item">
+					        	Click the button below to tell this web app to use OAUTH 2.0!
+					        </p>
+					</div>
+					<div class="flex-container">
+					        <p class="main-cont flex-item">
+					        	<a href="{{end_user_request}}">USE OAUTH!</a>
+					        </p>
+					</div>
+				</div>
 			</div>
 	        	{% endblock %}
 		

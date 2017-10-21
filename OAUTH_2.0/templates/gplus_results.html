@@ -2,13 +2,21 @@
 {% block content  %}
 	<section>
 		<div class="flex-container">
-			<h1 class="flex-item main-cont">Data from Google Plus via OAUTH2.0</h1>
+			<div class="flex-item main-cont" id="sub-head-text">
+				<h1 class="flex-item main-cont" id="headline-text">Data from Google Plus via OAUTH2.0</h1>
+			</div>
 		</div>
 		<div class="flex-container">
-			<h3 class="flex-item main-cont">User: {{user_name}} </h3>
+			<div class="flex-item main-cont" id="sub-head-text">
+				<h3 id="gplus-field">User: </h3>
+				<h3>{{user_name}} </h3>
+			</div>
 		</div>
 		<div class="flex-container">
-			<h3 class="flex-item main-cont">Email: {{email}} </h3>
+			<div class="flex-item main-cont" id="sub-head-text">
+				<h3 id="gplus-field">Email: </h3>
+				<h3>{{email}} </h3>
+			</div>
 		</div>
 
 	</section>
