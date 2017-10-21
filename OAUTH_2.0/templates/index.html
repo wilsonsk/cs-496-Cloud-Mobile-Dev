@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
         <title>{{ title }}</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
@@ -19,7 +20,7 @@
 		<section>
 	
 	        	{% block content %}
-			<div class="flex-container" style="height: 300px;">
+			<div class="flex-container">
 				<p class="main-cont flex-item" id="headline-text">
 					This is an Oregon State University OAUTH2.0 Assignment.
 				</p>
@@ -38,7 +39,7 @@
 					</div>
 					<div class="flex-container">
 					        <p class="main-cont flex-item">
-					        	<a href="{{end_user_request}}">USE OAUTH!</a>
+							<a href="{{end_user_request}}" role="button" class="btn btn-primary" id="button-text">USE OAUTH!</a>
 					        </p>
 					</div>
 				</div>
